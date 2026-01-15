@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>{% block title %}SmartMeterAI{% endblock %}</title>
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Chart.js CDN (Global) -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  {% block head %}{% endblock %}
+</head>
+
+<body class="bg-gray-50 min-h-screen">
+
+  <!-- Navbar -->
+  <nav class="bg-white border-b shadow-sm">
+    <div class="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
+
+      <!-- Logo / Brand -->
+      <a href="/" class="text-xl font-bold text-gray-800">
+        ResQ
+      </a>
+
+      <!-- Nav Links -->
+      <div class="flex gap-2">
+        <a href="/" class="px-4 py-2 rounded-lg bg-gray-800 text-white hover:bg-gray-900 transition">
+          Upload
+        </a>
+        <a href="/dashboard" class="px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition">
+          Dashboard
+        </a>
+        <a href="/alerts" class="px-4 py-2 rounded-lg bg-red-600 text-white hover:bg-red-700 transition">
+          Alerts
+        </a>
+        <a href="/review" class="px-4 py-2 rounded-lg bg-green-600 text-white hover:bg-green-700 transition">
+          Review
+        </a>
+      </div>
+
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <main class="max-w-6xl mx-auto p-6">
+    {% block content %}{% endblock %}
+  </main>
+
+  <!-- Custom Chart Functions (static/chart.js) -->
+  <script src="/static/chart.js"></script>
+
+</body>
+</html>

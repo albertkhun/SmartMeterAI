@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block title %}Review | SmartMeterAI{% endblock %}
+
+{% block content %}
+  <div class="mb-6">
+    <h1 class="text-2xl font-bold text-gray-800">🧑‍⚖️ Human-in-the-Loop Review</h1>
+    <p class="text-gray-500 text-sm">Confirm AI prediction or mark false alarm.</p>
+  </div>
+
+  <div class="bg-white rounded-2xl shadow p-6 max-w-xl">
+    <form action="/review" method="post" class="space-y-4">
+      <div>
+        <label class="block text-sm font-semibold text-gray-700 mb-1">Consumer ID</label>
+        <input type="text" name="consumer_id" required
+               class="w-full border rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-green-500"/>
+      </div>
+
+      <div>
+        <label class="block text-sm font-semibold text-gray-700 mb-1">Decision</label>
+        <select name="decision"
+                class="w-full border rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-green-500">
+          <option value="theft"> Confirm Theft</option>
+          <option value="false_alarm"> False Alarm</option>
+          <option value="need_more_data">⏳ Need More Data</option>
+        </select>
+      </div>
+
+      <div>
+        <label class="block text-sm font-semibold text-gray-700 mb-1">Note (optional)</label>
+        <input type="text" name="note"
+               class="w-full border rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-green-500"/>
+      </div>
+
+      <button type="submit"
+              class="w-full py-3 rounded-xl bg-green-600 text-white font-semibold hover:bg-green-700 transition">
+        Submit Review
+      </button>
+    </form>
+  </div>
+{% endblock %}

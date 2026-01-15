@@ -1,0 +1,20 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 20px;
+}
+
+.msg {
+    color: green;
+    font-weight: bold;
+}
+
+.cards {
+    display: flex;
+    gap: 15px;
+}
+
+.card {
+    padding: 15px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+}
