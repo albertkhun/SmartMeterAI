@@ -4,8 +4,41 @@
 
 {% block content %}
   <div class="mb-6">
-    <h1 class="text-2xl font-bold text-gray-800"> Alerts (Inspection Priority List)</h1>
-    <p class="text-gray-500 text-sm">Sorted by risk score (highest first).</p>
+    <div class="flex items-center justify-between gap-4 flex-wrap">
+      <div>
+        <h1 class="text-2xl font-bold text-gray-800"> Alerts (Inspection Priority List)</h1>
+        <p class="text-gray-500 text-sm">Sorted by risk score (highest first).</p>
+      </div>
+
+      <!-- Filters + Download -->
+      <div class="flex gap-2 flex-wrap">
+        <a href="/alerts?filter=all"
+           class="px-3 py-2 rounded-lg text-sm font-semibold border {% if filter == 'all' %}bg-gray-900 text-white{% else %}bg-white text-gray-700{% endif %}">
+          All
+        </a>
+
+        <a href="/alerts?filter=inspection"
+           class="px-3 py-2 rounded-lg text-sm font-semibold border {% if filter == 'inspection' %}bg-red-600 text-white{% else %}bg-white text-gray-700{% endif %}">
+          Inspection
+        </a>
+
+        <a href="/alerts?filter=monitor"
+           class="px-3 py-2 rounded-lg text-sm font-semibold border {% if filter == 'monitor' %}bg-yellow-500 text-white{% else %}bg-white text-gray-700{% endif %}">
+          Monitor
+        </a>
+
+        <a href="/alerts?filter=normal"
+           class="px-3 py-2 rounded-lg text-sm font-semibold border {% if filter == 'normal' %}bg-green-600 text-white{% else %}bg-white text-gray-700{% endif %}">
+          Normal
+        </a>
+
+        <a href="/download-report-pdf"
+   class="px-3 py-2 rounded-lg text-sm font-semibold border bg-blue-600 text-white hover:bg-blue-700">
+  ⬇ Download PDF Report
+</a>
+
+      </div>
+    </div>
   </div>
 
   <div class="bg-white rounded-2xl shadow p-6">
@@ -29,20 +62,34 @@
                 {{ r.consumer_id }}
               </a>
             </td>
-            <td class="px-4 py-2 border font-semibold">{{ r.risk_score }}</td>
+
+            <td class="px-4 py-2 border font-semibold">
+              {{ "%.2f"|format(r.risk_score) }}
+            </td>
+
             <td class="px-4 py-2 border">
-              {% if r.label == "Anomaly" %}
+              {% if r.label == "Inspection" %}
                 <span class="px-3 py-1 rounded-full bg-red-100 text-red-700 text-xs font-semibold">
-                  Anomaly
+                  🔴 Inspection
+                </span>
+              {% elif r.label == "Monitor" %}
+                <span class="px-3 py-1 rounded-full bg-yellow-100 text-yellow-800 text-xs font-semibold">
+                  🟠 Monitor
                 </span>
               {% else %}
                 <span class="px-3 py-1 rounded-full bg-green-100 text-green-700 text-xs font-semibold">
-                  Normal
+                  🟢 Normal
                 </span>
               {% endif %}
             </td>
-            <td class="px-4 py-2 border text-gray-700">{{ r.reason }}</td>
-            <td class="px-4 py-2 border text-gray-700">{{ r.action }}</td>
+
+            <td class="px-4 py-2 border text-gray-700">
+              {{ r.reason }}
+            </td>
+
+            <td class="px-4 py-2 border text-gray-700 font-semibold">
+              {{ r.action }}
+            </td>
           </tr>
           {% endfor %}
         </tbody>

@@ -1,51 +1,51 @@
-import pandas as pd
 import numpy as np
+import pandas as pd
 
 def make_features(df: pd.DataFrame) -> pd.DataFrame:
-    # Convert to daily usage
-    df["date"] = df["timestamp"].dt.date
+    data = df.copy()
+    data.columns = [c.strip().lower() for c in data.columns]
 
-    daily = df.groupby(["consumer_id", "date"])["kwh"].sum().reset_index()
-    daily = daily.sort_values(["consumer_id", "date"])
+    # Find consumption column
+    consumption_col = None
+    for c in ["kwh", "units", "consumption", "energy"]:
+        if c in data.columns:
+            consumption_col = c
+            break
 
-    # Feature engineering per consumer
-    features = daily.groupby("consumer_id")["kwh"].agg(
-        avg_kwh="mean",
-        std_kwh="std",
-        max_kwh="max",
-        min_kwh="min",
-        total_days="count"
-    ).reset_index()
+    if consumption_col is None:
+        raise ValueError("CSV must contain one column: kwh/units/consumption/energy")
 
-    # Fill std NaN with 0 (if only 1 day)
-    features["std_kwh"] = features["std_kwh"].fillna(0)
+    data[consumption_col] = pd.to_numeric(data[consumption_col], errors="coerce").fillna(0)
+    data[consumption_col] = data[consumption_col].clip(lower=0)
 
-    # Sudden drop/spike detection (simple)
-    daily["prev_kwh"] = daily.groupby("consumer_id")["kwh"].shift(1)
-    daily["change"] = daily["kwh"] - daily["prev_kwh"]
+    features = []
+    for consumer_id, g in data.groupby("consumer_id"):
+        vals = g[consumption_col].values.astype(float)
 
-    drop = daily[daily["change"] < 0].groupby("consumer_id")["change"].min().reset_index()
-    spike = daily[daily["change"] > 0].groupby("consumer_id")["change"].max().reset_index()
+        avg = float(np.mean(vals))
+        std = float(np.std(vals))
+        zero_ratio = float(np.mean(vals == 0))
 
-    drop.rename(columns={"change": "max_drop"}, inplace=True)
-    spike.rename(columns={"change": "max_spike"}, inplace=True)
+        n = len(vals)
+        k = max(1, int(0.3 * n))
+        first_avg = float(np.mean(vals[:k]))
+        last_avg = float(np.mean(vals[-k:]))
 
-    features = features.merge(drop, on="consumer_id", how="left")
-    features = features.merge(spike, on="consumer_id", how="left")
+        drop_ratio = 0.0
+        if first_avg > 0:
+            drop_ratio = max(0.0, (first_avg - last_avg) / (first_avg + 1e-9))
 
-    features["max_drop"] = features["max_drop"].fillna(0)
-    features["max_spike"] = features["max_spike"].fillna(0)
+        spike_ratio = 0.0
+        if avg > 0:
+            spike_ratio = float(np.max(vals) / (avg + 1e-9))
 
-    # % change estimate
-    features["drop_percent"] = np.where(
-        features["avg_kwh"] > 0,
-        abs(features["max_drop"]) / features["avg_kwh"] * 100,
-        0
-    )
-    features["spike_percent"] = np.where(
-        features["avg_kwh"] > 0,
-        abs(features["max_spike"]) / features["avg_kwh"] * 100,
-        0
-    )
+        features.append({
+            "consumer_id": consumer_id,
+            "avg_kwh": round(avg, 3),
+            "std_kwh": round(std, 3),
+            "zero_ratio": round(zero_ratio, 3),
+            "drop_ratio": round(drop_ratio, 3),
+            "spike_ratio": round(spike_ratio, 3),
+        })
 
-    return features
+    return pd.DataFrame(features)

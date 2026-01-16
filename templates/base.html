@@ -2,55 +2,63 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>{% block title %}SmartMeterAI{% endblock %}</title>
 
-  <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
-
-  <!-- Chart.js CDN (Global) -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-  {% block head %}{% endblock %}
 </head>
 
-<body class="bg-gray-50 min-h-screen">
+<body class="bg-gray-50 text-gray-900">
 
   <!-- Navbar -->
   <nav class="bg-white border-b shadow-sm">
-    <div class="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
+    <div class="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
+      <a href="/" class="text-xl font-extrabold text-gray-900">SmartMeterAI</a>
 
-      <!-- Logo / Brand -->
-      <a href="/" class="text-xl font-bold text-gray-800">
-        ResQ
-      </a>
+      <!-- Mobile menu button -->
+      <button id="menuBtn"
+        class="md:hidden px-3 py-2 rounded-lg border text-sm font-semibold hover:bg-gray-100">
+        ☰ Menu
+      </button>
 
-      <!-- Nav Links -->
-      <div class="flex gap-2">
-        <a href="/" class="px-4 py-2 rounded-lg bg-gray-800 text-white hover:bg-gray-900 transition">
-          Upload
-        </a>
-        <a href="/dashboard" class="px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition">
-          Dashboard
-        </a>
-        <a href="/alerts" class="px-4 py-2 rounded-lg bg-red-600 text-white hover:bg-red-700 transition">
-          Alerts
-        </a>
-        <a href="/review" class="px-4 py-2 rounded-lg bg-green-600 text-white hover:bg-green-700 transition">
-          Review
-        </a>
+      <!-- Desktop menu -->
+      <div class="hidden md:flex gap-3 text-sm font-semibold">
+        <a href="/" class="px-3 py-2 rounded-lg hover:bg-gray-100">Upload</a>
+        <a href="/dashboard" class="px-3 py-2 rounded-lg hover:bg-gray-100">Dashboard</a>
+        <a href="/alerts" class="px-3 py-2 rounded-lg hover:bg-gray-100">Alerts</a>
+        <a href="/review" class="px-3 py-2 rounded-lg hover:bg-gray-100">Review</a>
+        
       </div>
+    </div>
 
+    <!-- Mobile menu dropdown -->
+    <div id="mobileMenu" class="hidden md:hidden px-4 pb-4">
+      <div class="flex flex-col gap-2 text-sm font-semibold">
+        <a href="/" class="px-3 py-2 rounded-lg hover:bg-gray-100">Upload</a>
+        <a href="/dashboard" class="px-3 py-2 rounded-lg hover:bg-gray-100">Dashboard</a>
+        <a href="/alerts" class="px-3 py-2 rounded-lg hover:bg-gray-100">Alerts</a>
+        <a href="/review" class="px-3 py-2 rounded-lg hover:bg-gray-100">Review</a>
+        <a href="/heatmap" class="px-3 py-2 rounded-lg hover:bg-gray-100">Heatmap</a>
+      </div>
     </div>
   </nav>
 
-  <!-- Main Content -->
-  <main class="max-w-6xl mx-auto p-6">
-    {% block content %}{% endblock %}
+  <!-- MAIN CONTENT -->
+  <main class="max-w-7xl mx-auto px-4 py-6 md:py-8">
+    {% block content %}
+    {% endblock %}
   </main>
 
-  <!-- Custom Chart Functions (static/chart.js) -->
-  <script src="/static/chart.js"></script>
+  <script>
+    const menuBtn = document.getElementById("menuBtn");
+    const mobileMenu = document.getElementById("mobileMenu");
+
+    if (menuBtn && mobileMenu) {
+      menuBtn.addEventListener("click", () => {
+        mobileMenu.classList.toggle("hidden");
+      });
+    }
+  </script>
 
 </body>
 </html>

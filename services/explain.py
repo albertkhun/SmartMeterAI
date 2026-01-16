@@ -1,28 +1,28 @@
-def generate_reason(row) -> str:
+# services/explain.py
+def build_reason_text(row) -> str:
+    """
+    Human-readable explainability for PPT + dashboard.
+    """
     reasons = []
 
-    if row["drop_percent"] > 50:
-        reasons.append("Sudden drop in usage (possible bypass/theft)")
+    # Add rule reasons if present
+    if "rule_reasons" in row and isinstance(row["rule_reasons"], list):
+        reasons.extend(row["rule_reasons"])
 
-    if row["spike_percent"] > 50:
-        reasons.append("Sudden spike in usage (possible tampering/overload)")
+    # Add model insight
+    if "classical_ml_score" in row:
+        if row["classical_ml_score"] >= 0.75:
+            reasons.append("Classical ML models detected strong anomaly pattern")
+        elif row["classical_ml_score"] >= 0.45:
+            reasons.append("ML detected moderate anomaly pattern")
 
-    if row["std_kwh"] < 1 and row["avg_kwh"] > 0:
-        reasons.append("Very flat usage pattern (meter stuck/tampered)")
-
-    if row["avg_kwh"] < 1:
-        reasons.append("Very low usage (suspicious zero/near-zero consumption)")
+    # Confidence messaging
+    if "confidence" in row:
+        if row["confidence"] < 0.45:
+            reasons.append("Low confidence: needs more data / manual verification")
 
     if not reasons:
-        reasons.append("Unusual pattern detected by anomaly model")
+        return "Consumption pattern looks normal based on current data."
 
-    return " | ".join(reasons)
-
-
-def recommend_action(risk_score: float) -> str:
-    if risk_score >= 80:
-        return "Send inspection team now"
-    elif risk_score >= 60:
-        return "Schedule meter check"
-    else:
-        return "Monitor"
+    # Keep it short for UI
+    return "; ".join(reasons[:4])

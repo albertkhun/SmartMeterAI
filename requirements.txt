@@ -8,3 +8,5 @@ sqlalchemy
 python-multipart
 openpyxl
 xlrd
+reportlab
+

@@ -1,20 +1,46 @@
 body {
-    font-family: Arial, sans-serif;
-    margin: 20px;
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 16px;
+  background: #f9fafb;
 }
 
+/* message */
 .msg {
-    color: green;
-    font-weight: bold;
+  color: #16a34a;
+  font-weight: 700;
+  background: #dcfce7;
+  border: 1px solid #86efac;
+  padding: 10px 14px;
+  border-radius: 10px;
+  display: inline-block;
 }
 
+/* cards layout */
 .cards {
-    display: flex;
-    gap: 15px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 15px;
+  margin-top: 16px;
 }
 
+/* each card */
 .card {
-    padding: 15px;
-    border: 1px solid #ccc;
-    border-radius: 8px;
+  padding: 16px;
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 14px;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.06);
+  transition: 0.2s ease;
+}
+
+.card:hover {
+  transform: translateY(-2px);
+}
+
+/* mobile spacing */
+@media (max-width: 600px) {
+  body {
+    padding: 10px;
+  }
 }

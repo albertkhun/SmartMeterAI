@@ -4,31 +4,50 @@
 
 {% block content %}
   <div class="mb-6">
-    <h1 class="text-2xl font-bold text-gray-800">📊 Dashboard Overview</h1>
-    <p class="text-gray-500 text-sm">System-wide anomaly summary and critical cases.</p>
+    <h1 class="text-2xl font-bold text-gray-800">Dashboard Overview</h1>
+    <p class="text-gray-500 text-sm">
+      Hybrid AI summary: Rule Engine + Classical ML + Meta-Ensemble decisions.
+    </p>
   </div>
 
-  <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+  <!-- Summary Cards -->
+  <div class="grid grid-cols-1 md:grid-cols-5 gap-4 mb-8">
     <div class="bg-white rounded-2xl shadow p-5">
       <p class="text-gray-500 text-sm">Total Consumers</p>
       <p class="text-2xl font-bold text-gray-800">{{ total_consumers }}</p>
     </div>
+
     <div class="bg-white rounded-2xl shadow p-5">
       <p class="text-gray-500 text-sm">Total Records</p>
       <p class="text-2xl font-bold text-gray-800">{{ total_records }}</p>
     </div>
+
     <div class="bg-white rounded-2xl shadow p-5">
-      <p class="text-gray-500 text-sm">Anomalies Found</p>
-      <p class="text-2xl font-bold text-gray-800">{{ anomalies }}</p>
+      <p class="text-gray-500 text-sm">Normal</p>
+      <p class="text-2xl font-bold text-green-700">{{ normal }}</p>
     </div>
+
     <div class="bg-white rounded-2xl shadow p-5">
-      <p class="text-gray-500 text-sm">Critical Cases</p>
-      <p class="text-2xl font-bold text-gray-800">{{ critical }}</p>
+      <p class="text-gray-500 text-sm">Monitor</p>
+      <p class="text-2xl font-bold text-yellow-700">{{ monitor }}</p>
+    </div>
+
+    <div class="bg-white rounded-2xl shadow p-5">
+      <p class="text-gray-500 text-sm">Inspection Priority</p>
+      <p class="text-2xl font-bold text-red-700">{{ inspection }}</p>
     </div>
   </div>
 
+  <!-- Top Risky -->
   <div class="bg-white rounded-2xl shadow p-6">
-    <h2 class="text-lg font-bold text-gray-800 mb-4"> Top 5 Risky Consumers</h2>
+    <div class="flex items-center justify-between gap-4 flex-wrap mb-4">
+      <h2 class="text-lg font-bold text-gray-800">🔥 Top 5 High-Risk Consumers</h2>
+
+      <a href="/alerts?filter=inspection"
+         class="px-3 py-2 rounded-lg text-sm font-semibold border bg-red-600 text-white hover:bg-red-700">
+        View Inspection List →
+      </a>
+    </div>
 
     <div class="overflow-x-auto">
       <table class="min-w-full border border-gray-200 text-sm">
@@ -36,9 +55,11 @@
           <tr>
             <th class="px-4 py-2 border text-left">Consumer ID</th>
             <th class="px-4 py-2 border text-left">Risk Score</th>
+            <th class="px-4 py-2 border text-left">Label</th>
             <th class="px-4 py-2 border text-left">Reason</th>
           </tr>
         </thead>
+
         <tbody>
           {% for r in top_risky %}
           <tr class="hover:bg-gray-50">
@@ -47,11 +68,34 @@
                 {{ r.consumer_id }}
               </a>
             </td>
-            <td class="px-4 py-2 border font-semibold">{{ r.risk_score }}</td>
-            <td class="px-4 py-2 border text-gray-700">{{ r.reason }}</td>
+
+            <td class="px-4 py-2 border font-semibold">
+              {{ "%.2f"|format(r.risk_score) }}
+            </td>
+
+            <td class="px-4 py-2 border">
+              {% if r.label == "Inspection" %}
+                <span class="px-3 py-1 rounded-full bg-red-100 text-red-700 text-xs font-semibold">
+                  🔴 Inspection
+                </span>
+              {% elif r.label == "Monitor" %}
+                <span class="px-3 py-1 rounded-full bg-yellow-100 text-yellow-800 text-xs font-semibold">
+                  🟠 Monitor
+                </span>
+              {% else %}
+                <span class="px-3 py-1 rounded-full bg-green-100 text-green-700 text-xs font-semibold">
+                  🟢 Normal
+                </span>
+              {% endif %}
+            </td>
+
+            <td class="px-4 py-2 border text-gray-700">
+              {{ r.reason }}
+            </td>
           </tr>
           {% endfor %}
         </tbody>
+
       </table>
     </div>
   </div>

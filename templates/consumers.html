@@ -1,60 +1,80 @@
 {% extends "base.html" %}
 
-{% block title %}Consumer {{ consumer_id }} | SmartMeterAI{% endblock %}
-
-{% block head %}
-<div class="bg-white rounded-2xl shadow p-6">
-  <h2 class="text-lg font-bold text-gray-800 mb-4">📈 Usage Trend</h2>
-
-  <div class="h-80">
-    <canvas id="usageChart"></canvas>
-  </div>
-</div>
-
-<script>
-  const labels = {{ timestamps | tojson }};
-  const values = {{ kwh_values | tojson }};
-
-  renderUsageChart("usageChart", labels, values);
-</script>
-
-{% endblock %}
+{% block title %}Consumer Detail | SmartMeterAI{% endblock %}
 
 {% block content %}
   <div class="mb-6">
     <h1 class="text-2xl font-bold text-gray-800">👤 Consumer Detail: {{ consumer_id }}</h1>
-    <p class="text-gray-500 text-sm">Usage trend + AI risk explanation.</p>
+    <p class="text-gray-500 text-sm">Usage trend + Hybrid AI decision</p>
   </div>
 
-  <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-    <div class="bg-white rounded-2xl shadow p-6">
-      <h2 class="text-lg font-bold text-gray-800 mb-3">📌 Risk Summary</h2>
+  <!-- Risk Summary -->
+  <div class="bg-white rounded-2xl shadow p-6 mb-6">
+    {% if risk %}
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div>
+          <p class="text-gray-500 text-sm">Risk Score</p>
+          <p class="text-3xl font-bold text-gray-900">{{ "%.2f"|format(risk.risk_score) }}</p>
+        </div>
 
-      {% if risk %}
-        <p class="text-gray-700"><b>Risk Score:</b> {{ risk.risk_score }}</p>
-        <p class="text-gray-700"><b>Label:</b> {{ risk.label }}</p>
-        <p class="text-gray-700"><b>Reason:</b> {{ risk.reason }}</p>
-        <p class="text-gray-700"><b>Action:</b> {{ risk.action }}</p>
-      {% else %}
-        <p class="text-gray-500">No risk data found for this consumer.</p>
-      {% endif %}
-    </div>
+        <div>
+          <p class="text-gray-500 text-sm">Label</p>
+          <p class="font-semibold">{{ risk.label }}</p>
+        </div>
 
-    <div class="bg-white rounded-2xl shadow p-6">
-      <h2 class="text-lg font-bold text-gray-800 mb-3">⚡ Quick Actions</h2>
+        <div class="md:col-span-2">
+          <p class="text-gray-500 text-sm">Action</p>
+          <p class="font-semibold">{{ risk.action }}</p>
+        </div>
+      </div>
 
-      <a href="/alerts"
-         class="inline-block px-4 py-2 rounded-lg bg-gray-800 text-white hover:bg-gray-900 transition">
-        ← Back to Alerts
-      </a>
-
-      <a href="/review"
-         class="inline-block px-4 py-2 rounded-lg bg-green-600 text-white hover:bg-green-700 transition ml-2">
-        Review Case
-      </a>
-    </div>
+      <div class="mt-4">
+        <p class="text-gray-500 text-sm">Reason</p>
+        <p class="text-gray-800 text-sm mt-1">{{ risk.reason }}</p>
+      </div>
+    {% else %}
+      <p class="text-red-600 font-semibold">No risk data found for this consumer.</p>
+    {% endif %}
   </div>
 
+  <!-- Usage Trend -->
   <div class="bg-white rounded-2xl shadow p-6">
-    <h2 class="text-lg font-bold text-gray-800 mb-4">📈 Usage Trend</h2>
-    <canvas id="usageChart"></canvas>
+    <h2 class="text-lg font-bold text-gray-800 mb-3">📈 Usage Trend</h2>
+
+    {% if timestamps and kwh_values %}
+      <div class="h-72">
+        <canvas id="usageChart"></canvas>
+      </div>
+    {% else %}
+      <p class="text-gray-500 text-sm">No usage records available for this consumer.</p>
+    {% endif %}
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <script>
+    const labels = {{ timestamps | tojson }};
+    const dataPoints = {{ kwh_values | tojson }};
+
+    if (labels.length > 0 && dataPoints.length > 0) {
+      const ctx = document.getElementById('usageChart').getContext('2d');
+
+      new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: labels,
+          datasets: [{
+            label: 'kWh',
+            data: dataPoints,
+            borderWidth: 2,
+            tension: 0.3
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false
+        }
+      });
+    }
+  </script>
+{% endblock %}

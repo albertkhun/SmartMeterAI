@@ -3,39 +3,96 @@
 {% block title %}Review | SmartMeterAI{% endblock %}
 
 {% block content %}
-  <div class="mb-6">
-    <h1 class="text-2xl font-bold text-gray-800">🧑‍⚖️ Human-in-the-Loop Review</h1>
-    <p class="text-gray-500 text-sm">Confirm AI prediction or mark false alarm.</p>
+
+  <!-- Header -->
+  <div class="mb-8">
+    <div class="bg-gradient-to-r from-green-600 to-emerald-500 text-white rounded-2xl shadow p-6">
+      <h1 class="text-2xl md:text-3xl font-extrabold"> Review</h1>
+      <p class="text-white/90 text-sm mt-1">
+        Confirm AI prediction, mark false alarms, and improve model trust.
+      </p>
+    </div>
   </div>
 
-  <div class="bg-white rounded-2xl shadow p-6 max-w-xl">
-    <form action="/review" method="post" class="space-y-4">
+  <!-- Form Card -->
+  <div class="bg-white rounded-2xl shadow p-6 md:p-8 w-full max-w-xl mx-auto border border-gray-100">
+    <form action="/review" method="post" class="space-y-5">
+
+      <!-- Consumer ID -->
       <div>
-        <label class="block text-sm font-semibold text-gray-700 mb-1">Consumer ID</label>
-        <input type="text" name="consumer_id" required
-               class="w-full border rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-green-500"/>
+        <label class="block text-sm font-semibold text-gray-700 mb-2">Consumer ID</label>
+
+        <div class="relative">
+          <input
+            list="consumerList"
+            name="consumer_id"
+            required
+            placeholder="Search consumer (example: C005)"
+            class="w-full border border-gray-300 rounded-xl p-3 pl-11 text-sm
+                   focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500
+                   transition"
+          />
+          <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">🔎</span>
+        </div>
+
+        <datalist id="consumerList">
+          {% for cid in consumer_ids %}
+            <option value="{{ cid }}"></option>
+          {% endfor %}
+        </datalist>
+
+        <p class="text-xs text-gray-500 mt-2">
+          Tip: start typing to quickly find the consumer ID.
+        </p>
       </div>
 
+      <!-- Decision -->
       <div>
-        <label class="block text-sm font-semibold text-gray-700 mb-1">Decision</label>
+        <label class="block text-sm font-semibold text-gray-700 mb-2">Decision</label>
+
         <select name="decision"
-                class="w-full border rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-green-500">
-          <option value="theft"> Confirm Theft</option>
-          <option value="false_alarm"> False Alarm</option>
-          <option value="need_more_data">⏳ Need More Data</option>
+                class="w-full border border-gray-300 rounded-xl p-3 text-sm
+                       focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500
+                       transition bg-white">
+          <option value="Confirm Theft">Confirm Theft</option>
+          <option value="False Alarm">False Alarm</option>
+          <option value="Need More Data"></option> Need More Data</option>
         </select>
+
+        <p class="text-xs text-gray-500 mt-2">
+          This decision updates the AI label/action instantly.
+        </p>
       </div>
 
+      <!-- Note -->
       <div>
-        <label class="block text-sm font-semibold text-gray-700 mb-1">Note (optional)</label>
-        <input type="text" name="note"
-               class="w-full border rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-green-500"/>
+        <label class="block text-sm font-semibold text-gray-700 mb-2">Inspector Note (optional)</label>
+        <textarea
+          name="note"
+          rows="3"
+          placeholder="Write short reason or observation..."
+          class="w-full border border-gray-300 rounded-xl p-3 text-sm
+                 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500
+                 transition resize-none"
+        ></textarea>
       </div>
 
-      <button type="submit"
-              class="w-full py-3 rounded-xl bg-green-600 text-white font-semibold hover:bg-green-700 transition">
-        Submit Review
-      </button>
+      <!-- Buttons -->
+      <div class="flex flex-col md:flex-row gap-3">
+        <button type="submit"
+                class="w-full py-3 rounded-xl bg-green-600 text-white font-semibold
+                       hover:bg-green-700 transition shadow">
+          ✅ Submit Review
+        </button>
+
+        <a href="/alerts"
+           class="w-full py-3 rounded-xl bg-gray-100 text-gray-800 font-semibold
+                  hover:bg-gray-200 transition text-center">
+          ← Back to Alerts
+        </a>
+      </div>
+
     </form>
   </div>
+
 {% endblock %}
